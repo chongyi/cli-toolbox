@@ -24,7 +24,7 @@ pub struct UuidToolkit {
 
 #[derive(Subcommand)]
 pub enum UuidToolkitSubCommand {
-    GenerateUuid(GenerateUuidArgs)
+    Generate(GenerateUuidArgs)
 }
 
 #[derive(Args)]
@@ -44,7 +44,7 @@ pub enum UuidVersion {
 impl UuidToolkit {
     pub fn run(self) {
         match self.commands {
-            UuidToolkitSubCommand::GenerateUuid(args) => generate_uuid(args.version, args.count),
+            UuidToolkitSubCommand::Generate(args) => generate_uuid(args.version, args.count),
         }
     }
 }
@@ -60,6 +60,8 @@ fn generate_uuid(version: UuidVersion, count: usize) {
         hyphenated: String,
         #[tabled(rename = "Simple")]
         simple: String,
+        #[tabled(rename = "base62")]
+        bs62: String,
     }
 
     let mut table_data = vec![];
@@ -74,6 +76,7 @@ fn generate_uuid(version: UuidVersion, count: usize) {
             number: uuid.as_u128(),
             hyphenated: uuid.as_hyphenated().encode_lower(&mut buffer).to_string(),
             simple: uuid.as_simple().encode_lower(&mut buffer).to_string(),
+            bs62: bs62::encode_num(&uuid.as_u128()),
         })
     }
 
